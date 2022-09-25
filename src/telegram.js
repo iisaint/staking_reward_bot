@@ -15,8 +15,15 @@ module.exports = class Telegram {
       this.bot.sendMessage(msg.chat.id, "hello");
     });
 
-    this.bot.onText(/\/rewards (.+)/, async (msg, match) => {
+    this.bot.onText(/\/ksm_rewards (.+)/, async (msg, match) => {
       let response = await this.subscan.getRewards(match[1]);
+      response = `${displayOfCurrentMonth()}: ` + response;
+
+      this.bot.sendMessage(msg.chat.id, response);
+    });
+
+    this.bot.onText(/\/dot_rewards (.+)/, async (msg, match) => {
+      let response = await this.subscan.getRewards(match[1], 'polkadot');
       response = `${displayOfCurrentMonth()}: ` + response;
 
       this.bot.sendMessage(msg.chat.id, response);
@@ -30,7 +37,7 @@ module.exports = class Telegram {
       let response = '';
       for(let i=0; i < this.defaultStash.length; i++) {
         try {
-          const reward = await this.subscan.getRewards(this.defaultStash[i].stash);
+          const reward = await this.subscan.getRewards(this.defaultStash[i].stash, this.defaultStash[i].network);
           response += `${this.defaultStash[i].name}: ${reward}\n`;
         } catch (e) {
           console.log(e);

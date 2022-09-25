@@ -7,7 +7,7 @@ module.exports = class Subscan {
   constructor(apiKey) {
     this.apiKey = apiKey;
   }
-  async getRewards(stash) {
+  async getRewards(stash, network='kusama') {
     const begin = unixTimeOfCurrentMonth();
     let page = 0;
     let count = 0;
@@ -15,7 +15,7 @@ module.exports = class Subscan {
     while(true) {
       const res = await axios({
         method: 'post',
-        url: 'https://kusama.api.subscan.io/api/scan/account/reward_slash',
+        url: `https://${network}.api.subscan.io/api/scan/account/reward_slash`,
         headers: {'X-API-Key': this.apiKey, 'Content-Type': 'application/json'},
         data: {
           row: 20,
@@ -37,11 +37,20 @@ module.exports = class Subscan {
           page++;
           continue;
         } else {
-          return formatBalance(sum.toString(10), {
-            decimals: 12,
-            forceUnit: 'KSM',
-            withUnit: 'KSM',
-          });
+          if (network === 'kusama') {
+            return formatBalance(sum.toString(10), {
+              decimals: 12,
+              forceUnit: 'KSM',
+              withUnit: 'KSM',
+            });
+          } else {
+            return formatBalance(sum.toString(10), {
+              decimals: 10,
+              forceUnit: 'DOT',
+              withUnit: 'DOT',
+            });
+          }
+          
         }
       } else {
         return 0;
