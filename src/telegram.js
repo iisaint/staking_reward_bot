@@ -2,9 +2,10 @@ const TelegramBot = require('node-telegram-bot-api');
 const {displayOfCurrentMonth, delay} = require('./utils');
 
 module.exports = class Telegram {
-  constructor(token, subscan, defaultStash, delay) {
+  constructor(token, subscan, superPower, defaultStash, delay) {
     this.bot = new TelegramBot(token, {polling: true});
     this.subscan = subscan;
+    this.superPower = superPower;
     this.defaultStash = defaultStash;
     this.delay = delay;
   }
@@ -15,15 +16,17 @@ module.exports = class Telegram {
     });
 
     this.bot.onText(/\/rewards (.+)/, async (msg, match) => {
-      console.log(msg);
-      console.log(match);
       let response = await this.subscan.getRewards(match[1]);
       response = `${displayOfCurrentMonth()}: ` + response;
 
       this.bot.sendMessage(msg.chat.id, response);
     });
 
-    this.bot.onText(/\/all/, async (msg, match) => {
+    this.bot.onText(/\/all (.+)/, async (msg, match) => {
+      if (match[1] !== this.superPower) {
+        this.bot.sendMessage(msg.chat.id, 'You have no superpower.');
+        return;
+      }
       let response = '';
       for(let i=0; i < this.defaultStash.length; i++) {
         try {
