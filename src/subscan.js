@@ -13,17 +13,26 @@ module.exports = class Subscan {
     let count = 0;
     let sum = new BN('0', 10);
     while(true) {
-      const res = await axios({
-        method: 'post',
-        url: `https://${network}.api.subscan.io/api/scan/account/reward_slash`,
-        headers: {'X-API-Key': this.apiKey, 'Content-Type': 'application/json'},
-        data: {
-          row: 20,
-          page: page,
-          address: stash
+      let res;
+      try {
+        res = await axios({
+          method: 'post',
+          url: `https://${network}.api.subscan.io/api/scan/account/reward_slash`,
+          headers: {'X-API-Key': this.apiKey, 'Content-Type': 'application/json'},
+          data: {
+            row: 20,
+            page: page,
+            address: stash
+          }
+        })
+      } catch (e) {
+        if (e.response.status === 400) {
+          return e.response.data.message;
         }
-      })
-      if (res.status === 200 && res.data.message === 'Success') {
+        console.log(e.code);
+        return 'Sorry, something went wrong...';
+      }
+      if (res.status === 200 && res.data.message === 'Success' && res.data.data.count !==0) {
         const data = res.data.data;
         count = data.count;
 
@@ -50,10 +59,9 @@ module.exports = class Subscan {
               withUnit: 'DOT',
             });
           }
-          
         }
       } else {
-        return 0;
+        return 'data not found';
       }
     }
   }

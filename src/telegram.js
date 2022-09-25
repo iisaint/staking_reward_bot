@@ -1,5 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const {displayOfCurrentMonth, delay} = require('./utils');
+const {MSG_HELP} = require('./message');
 
 module.exports = class Telegram {
   constructor(token, subscan, superPower, defaultStash, delay) {
@@ -12,19 +13,24 @@ module.exports = class Telegram {
 
   async start () {
     this.bot.onText(/\/start/, (msg, match) => {
-      this.bot.sendMessage(msg.chat.id, "hello");
+      this.bot.sendMessage(msg.chat.id, MSG_HELP());
+    });
+
+    this.bot.onText(/\/help/, (msg, match) => {
+      this.bot.sendMessage(msg.chat.id, MSG_HELP());
     });
 
     this.bot.onText(/\/ksm_rewards (.+)/, async (msg, match) => {
+      console.log(match);
       let response = await this.subscan.getRewards(match[1]);
-      response = `${displayOfCurrentMonth()}: ` + response;
+      response = `${displayOfCurrentMonth()} --> ` + response;
 
       this.bot.sendMessage(msg.chat.id, response);
     });
 
     this.bot.onText(/\/dot_rewards (.+)/, async (msg, match) => {
       let response = await this.subscan.getRewards(match[1], 'polkadot');
-      response = `${displayOfCurrentMonth()}: ` + response;
+      response = `${displayOfCurrentMonth()} --> ` + response;
 
       this.bot.sendMessage(msg.chat.id, response);
     });
@@ -44,7 +50,7 @@ module.exports = class Telegram {
         }
         await delay(this.delay);
       }
-      response = `${displayOfCurrentMonth()}: \n` + response;
+      response = `  ${displayOfCurrentMonth()}  \n` + response;
       this.bot.sendMessage(msg.chat.id, response);
     });
   }
