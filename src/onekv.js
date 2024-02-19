@@ -24,7 +24,7 @@ module.exports = class Onekv {
         name: candidate.name,
         rank: candidate.rank,
         total: candidate.total,
-        score
+        score: candidate.score
     }));
 
       console.log(`finalCandidates: ${finalCandidates.length}`)
