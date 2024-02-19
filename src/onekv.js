@@ -23,7 +23,8 @@ module.exports = class Onekv {
       const finalCandidates = filteredCandidates.map((candidate) => ({
         name: candidate.name,
         rank: candidate.rank,
-        total: candidate.total
+        total: candidate.total,
+        score
     }));
 
       console.log(`finalCandidates: ${finalCandidates.length}`)
