@@ -38,7 +38,7 @@ module.exports = class Telegram {
     });
 
     this.bot.onText(/\/1kv/, async (msg, match) => {
-      let response = await this.onekv.getRank(this.defaultStash);
+      let response = await this.onekv.getRank_v2(this.defaultStash);
       response = `${displayOfCurrentMonth()} --> ` + JSON.stringify(response, undefined, 1);
 
       this.bot.sendMessage(msg.chat.id, response);
